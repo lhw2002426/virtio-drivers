@@ -14,6 +14,8 @@ use core::ptr::NonNull;
 use core::sync::atomic::{fence, Ordering};
 use zerocopy::FromBytes;
 
+use log::{info,debug};
+
 /// The mechanism for bulk data transport on virtio devices.
 ///
 /// Each device can have zero or more virtqueues.
@@ -191,6 +193,7 @@ impl<H: Hal, const SIZE: usize> VirtQueue<H, SIZE> {
     ) -> Result<u32> {
         // Safe because we don't return until the same token has been popped, so the buffers remain
         // valid and are not otherwise accessed until then.
+        debug!("lhw debug impl virto queue add notify wait pop");
         let token = unsafe { self.add(inputs, outputs) }?;
 
         // Notify the queue.

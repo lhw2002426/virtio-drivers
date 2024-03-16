@@ -6,7 +6,7 @@ use crate::transport::Transport;
 use crate::volatile::{volread, Volatile};
 use crate::{Error, Result};
 use bitflags::bitflags;
-use log::info;
+use log::{info, debug};
 use zerocopy::{AsBytes, FromBytes};
 
 const QUEUE: u16 = 0;
@@ -216,6 +216,7 @@ impl<H: Hal, T: Transport> VirtIOBlk<H, T> {
     ///
     /// Blocks until the write is complete or there is an error.
     pub fn write_block(&mut self, block_id: usize, buf: &[u8]) -> Result {
+        debug!("lhw debug impl virtio blk write block");
         assert_eq!(buf.len(), SECTOR_SIZE);
         let req = BlkReq {
             type_: ReqType::Out,
@@ -228,6 +229,7 @@ impl<H: Hal, T: Transport> VirtIOBlk<H, T> {
             &mut [resp.as_bytes_mut()],
             &mut self.transport,
         )?;
+        debug!("lhw debug impl virtio blk write block res: {:?}", resp.status);
         resp.status.into()
     }
 
