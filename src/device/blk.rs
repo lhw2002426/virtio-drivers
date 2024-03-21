@@ -96,6 +96,23 @@ impl<H: Hal, T: Transport> VirtIOBlk<H, T> {
         self.transport.ack_interrupt()
     }
 
+    /// send a flush request
+    pub fn flush_block(&mut self,block_id: usize) -> Result{
+        info!("lhw debug in impl virtio blk flush");
+        let req = BlkReq {
+            type_: ReqType::Flush,
+            reserved: 0,
+            sector: block_id as u64,
+        };
+        let mut resp = BlkResp::default();
+        self.queue.add_notify_wait_pop(
+            &[req.as_bytes()],
+            &mut [resp.as_bytes_mut()],
+            &mut self.transport,
+        )?;
+        resp.status.into()
+    }
+
     /// Reads a block into the given buffer.
     ///
     /// Blocks until the read completes or there is an error.
